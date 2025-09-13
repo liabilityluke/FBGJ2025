@@ -187,40 +187,37 @@ func check_for_chain() -> bool :
 	print("---")
 	var chain_detected := false
 	#check for clearing
+	var popping_blocks = []
 	for row in range(board_height - 1, -1, -1) :
 		for column in board_width :
 			var test_block = grid[column][row]
 			if test_block != null :
-				var blocks_to_check := [test_block]
 				var color_num = test_block.color_num
 				
-				for  check_block in blocks_to_check :
-					
-					#horizontal check :
-					for check_vector in [Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1)] :
-						var test_location = check_block.location + check_vector
-						var line_blocks := [check_block]
-						while true :
-							if test_location.x >= board_width or test_location.x < 0 or test_location.y < 0 or test_location.y >= board_height :
-								break
-							if grid[test_location.x][test_location.y] == null :
-								break
-							if grid[test_location.x][test_location.y].color_num != color_num :
-								break
-							line_blocks.append(grid[test_location.x][test_location.y])
-							test_location += check_vector
-							
-						if line_blocks.size() >= 3 :
-							for line_block in line_blocks :
-								if not line_block in blocks_to_check :
-									blocks_to_check.append(line_block)
+				for check_vector in [Vector2i(1, 0), Vector2i(0, -1)] :
+					var test_location = test_block.location + check_vector
+					var line_blocks := [test_block]
+					while true :
+						if test_location.x >= board_width or test_location.x < 0 or test_location.y < 0 or test_location.y >= board_height :
+							break
+						if grid[test_location.x][test_location.y] == null :
+							break
+						if grid[test_location.x][test_location.y].color_num != color_num :
+							break
+						line_blocks.append(grid[test_location.x][test_location.y])
+						test_location += check_vector
+						
+					if line_blocks.size() >= 3 :
+						for line_block in line_blocks :
+							if not line_block in popping_blocks :
+								popping_blocks.append(line_block)
 					
 				
-				if blocks_to_check.size() > 1 :
-					for popping_block in blocks_to_check :
-						popping_block.queue_free()
-						grid[popping_block.location.x][popping_block.location.y] = null
-					chain_detected = true
+	if popping_blocks.size() > 1 :
+		for popping_block in popping_blocks :
+			popping_block.queue_free()
+			grid[popping_block.location.x][popping_block.location.y] = null
+		chain_detected = true
 			
 	
 	#check for merging
