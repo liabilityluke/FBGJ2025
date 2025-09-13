@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://dxaxjhc4nxrt3" path="res://endless.gd" id="1_mjc6l"]
 
-[node name="Node2D" type="Node2D"]
+[node name="Board" type="Node2D"]
 script = ExtResource("1_mjc6l")
 
 [node name="ColorRect" type="ColorRect" parent="."]
