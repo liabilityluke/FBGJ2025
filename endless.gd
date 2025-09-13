@@ -26,6 +26,8 @@ var in_chain := false
 
 var block := preload("res://block.tscn")
 
+@export var primary_chance := 0.75
+
 func _ready() -> void:
 	#form the grid
 	for i in board_width :
@@ -293,12 +295,12 @@ func spawn_blocks() -> void :
 	
 	if is_valid_move(spawn_location) and is_valid_move(spawn_location + Vector2i(0, -1)) :
 		seed_block = block.instantiate()
-		seed_block.change_color(generate_weighted_random_color())
+		seed_block.change_color(generate_weighted_random_color(primary_chance))
 		move_block(seed_block, spawn_location)
 		add_child(seed_block)
 		
 		stem_block = block.instantiate()
-		stem_block.change_color(generate_weighted_random_color())
+		stem_block.change_color(generate_weighted_random_color(primary_chance))
 		move_block(stem_block, spawn_location + Vector2i(0, -1))
 		add_child(stem_block)
 	else :
