@@ -48,46 +48,44 @@ func _ready() -> void:
 	chain_timer.wait_time = chain_time
 	chain_timer.one_shot = true
 	chain_timer.timeout.connect(on_chain_timer_timeout)
-	chain_timer.start()
 
 	drop_timer = Timer.new()
 	add_child(drop_timer)
 	drop_timer.wait_time = drop_time
 	drop_timer.one_shot = true
 	drop_timer.timeout.connect(_on_drop_timer_timeout)
-	drop_timer.start()
 
 func _input(event: InputEvent) -> void:
-	if event.is_action_pressed("ui_left") :
-		var new_seed_location = seed_block.location + Vector2i(-1, 0)
-		var new_stem_location = stem_block.location + Vector2i(-1, 0)
-		if is_valid_move(new_seed_location) and is_valid_move(new_stem_location) :
-			if rotation_state != 3 :
-				move_block(seed_block, new_seed_location)
-				move_block(stem_block, new_stem_location)
-			else :
-				move_block(stem_block, new_stem_location)
-				move_block(seed_block, new_seed_location)
-	elif event.is_action_pressed("ui_right") :
-		var new_seed_location = seed_block.location + Vector2i(1, 0)
-		var new_stem_location = stem_block.location + Vector2i(1, 0)
-		if is_valid_move(new_seed_location) and is_valid_move(new_stem_location) :
-			if rotation_state != 1 :
-				move_block(seed_block, new_seed_location)
-				move_block(stem_block, new_stem_location)
-			else :
-				move_block(stem_block, new_stem_location)
-				move_block(seed_block, new_seed_location)
-	elif event.is_action_pressed("ui_accept") :
-		rotate_falling_blocks(false)
-	elif event.is_action_pressed("ui_cancel") :
-		rotate_falling_blocks(true)
-	elif event.is_action_pressed("ui_down") :
-		_on_gravity_timer_timeout()
-		gravity_timer.wait_time = 0.1
-		gravity_timer.start()
-		fast_dropping = true
-		
+	if seed_block != null and stem_block != null :
+		if event.is_action_pressed("ui_left") :
+			var new_seed_location = seed_block.location + Vector2i(-1, 0)
+			var new_stem_location = stem_block.location + Vector2i(-1, 0)
+			if is_valid_move(new_seed_location) and is_valid_move(new_stem_location) :
+				if rotation_state != 3 :
+					move_block(seed_block, new_seed_location)
+					move_block(stem_block, new_stem_location)
+				else :
+					move_block(stem_block, new_stem_location)
+					move_block(seed_block, new_seed_location)
+		elif event.is_action_pressed("ui_right") :
+			var new_seed_location = seed_block.location + Vector2i(1, 0)
+			var new_stem_location = stem_block.location + Vector2i(1, 0)
+			if is_valid_move(new_seed_location) and is_valid_move(new_stem_location) :
+				if rotation_state != 1 :
+					move_block(seed_block, new_seed_location)
+					move_block(stem_block, new_stem_location)
+				else :
+					move_block(stem_block, new_stem_location)
+					move_block(seed_block, new_seed_location)
+		elif event.is_action_pressed("ui_accept") :
+			rotate_falling_blocks(false)
+		elif event.is_action_pressed("ui_cancel") :
+			rotate_falling_blocks(true)
+		elif event.is_action_pressed("ui_down") :
+			_on_gravity_timer_timeout()
+			gravity_timer.wait_time = 0.1
+			gravity_timer.start()
+			fast_dropping = true
 
 func _process(delta: float) -> void:
 	if !Input.is_action_pressed("ui_down") and fast_dropping :
@@ -143,9 +141,10 @@ func place_piece() :
 	seed_block = null
 	stem_block = null
 	
-	drop_blocks()
-	check_for_chain()
-	drop_blocks()
+	on_chain_timer_timeout()
+	#drop_blocks()
+	#check_for_chain()
+	#drop_blocks()
 	#var test_location : Vector2i
 	#test_location = dropping_seed_block.location + Vector2i(0, 1)
 	#while is_valid_move(test_location) :
@@ -157,14 +156,18 @@ func place_piece() :
 		#move_block(dropping_stem_block, test_location)
 		#test_location += Vector2i(0, 1)
 	
-	spawn_blocks()
+	#spawn_blocks()
 	pass #turn falling pieces into real pieces, check for chain
 
 func on_chain_timer_timeout() :
-	pass
+	drop_blocks()
+	drop_timer.start()
 
 func _on_drop_timer_timeout() :
-	pass
+	if check_for_chain() :
+		chain_timer.start()
+	else :
+		spawn_blocks()
 
 func drop_blocks() :
 	for row in range(board_height - 1, -1, -1) :
@@ -179,6 +182,7 @@ func drop_blocks() :
 
 #return true if the chain is continuing
 func check_for_chain() -> bool :
+	var chain_detected := false
 	#check for clearing
 	for row in range(board_height - 1, -1, -1) :
 		for column in board_width :
@@ -199,7 +203,6 @@ func check_for_chain() -> bool :
 						if grid[test_location.x][test_location.y].color_num != color_num :
 							break
 						horizontal_blocks.append(grid[test_location.x][test_location.y])
-						print("found something horizontally!")
 						test_location += Vector2i(1, 0)
 						
 					if horizontal_blocks.size() >= 3 :
@@ -218,9 +221,7 @@ func check_for_chain() -> bool :
 						if grid[test_location.x][test_location.y].color_num != color_num :
 							break
 						vertical_blocks.append(grid[test_location.x][test_location.y])
-						print("found something vertical!")
 						test_location += Vector2i(0, -1)
-					print("found")
 					if vertical_blocks.size() >= 3 :
 						for vertical_block in vertical_blocks :
 							if not vertical_block in blocks_to_check :
@@ -230,6 +231,7 @@ func check_for_chain() -> bool :
 					for popping_block in blocks_to_check :
 						popping_block.queue_free()
 						grid[popping_block.location.x][popping_block.location.y] = null
+					chain_detected = true
 			
 	
 	#check for merging
@@ -282,20 +284,21 @@ func check_for_chain() -> bool :
 						grid[column][row - 1].queue_free()
 						grid[column][row - 1] = null
 						test_block.change_color(combination_color)
+						chain_detected = true
 	
-	return false
+	return chain_detected
 
 func spawn_blocks() -> void :
 	rotation_state = 0
 	
 	if is_valid_move(spawn_location) and is_valid_move(spawn_location + Vector2i(0, -1)) :
 		seed_block = block.instantiate()
-		seed_block.change_color(randi_range(0, 2))
+		seed_block.change_color(generate_weighted_random_color())
 		move_block(seed_block, spawn_location)
 		add_child(seed_block)
 		
 		stem_block = block.instantiate()
-		stem_block.change_color(randi_range(0, 2))
+		stem_block.change_color(generate_weighted_random_color())
 		move_block(stem_block, spawn_location + Vector2i(0, -1))
 		add_child(stem_block)
 	else :
@@ -313,4 +316,11 @@ func is_valid_move(location) -> bool :
 	if location.x >= board_width or location.x < 0 or location.y >= board_height or location.y < 0: 
 		return false
 	return (grid[location.x][location.y] == null) or (grid[location.x][location.y] == seed_block) or (grid[location.x][location.y] == stem_block)
+	
+func generate_weighted_random_color(primary_weight := 0.75) :
+	pass
+	if randf() < primary_weight :
+		return randi_range(0, 2)
+	else :
+		return randi_range(3, 5)
 	
