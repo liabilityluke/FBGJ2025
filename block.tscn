@@ -1,0 +1,30 @@
+[gd_scene load_steps=8 format=3 uid="uid://bwtgentno6dxp"]
+
+[ext_resource type="Script" uid="uid://dxqxw7a5ehikk" path="res://block.gd" id="1_im0tn"]
+[ext_resource type="Texture2D" uid="uid://l078ar0ah6mw" path="res://assets/blue.png" id="2_mk58r"]
+[ext_resource type="Texture2D" uid="uid://deo4y2h8hd66i" path="res://assets/green.png" id="3_e2bb5"]
+[ext_resource type="Texture2D" uid="uid://dhraq3hk7ke7e" path="res://assets/red.png" id="4_5npld"]
+
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_5npld"]
+blend_mode = 1
+
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_mk58r"]
+blend_mode = 1
+
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_e2bb5"]
+blend_mode = 1
+
+[node name="Node2D" type="Node2D"]
+script = ExtResource("1_im0tn")
+
+[node name="Red" type="Sprite2D" parent="."]
+material = SubResource("CanvasItemMaterial_5npld")
+texture = ExtResource("4_5npld")
+
+[node name="Blue" type="Sprite2D" parent="."]
+material = SubResource("CanvasItemMaterial_mk58r")
+texture = ExtResource("2_mk58r")
+
+[node name="Green" type="Sprite2D" parent="."]
+material = SubResource("CanvasItemMaterial_e2bb5")
+texture = ExtResource("3_e2bb5")
