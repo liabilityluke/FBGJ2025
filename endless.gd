@@ -179,7 +179,7 @@ func drop_blocks() :
 				var test_location : Vector2i
 				test_location = dropping_block.location + Vector2i(0, 1)
 				while is_valid_move(test_location) :
-					move_block(dropping_block, test_location)
+					move_block(dropping_block, test_location, true)
 					test_location += Vector2i(0, 1)
 
 #return true if the chain is continuing
@@ -269,7 +269,7 @@ func check_for_chain() -> bool :
 					if combination_color != -1 :
 						grid[column][row - 1].queue_free()
 						grid[column][row - 1] = null
-						test_block.change_color(combination_color)
+						test_block.change_color(combination_color, true)
 						chain_detected = true
 	
 	return chain_detected
@@ -290,13 +290,18 @@ func spawn_blocks() -> void :
 	else :
 		print("you lose!!!!!")
 
-func move_block(block_to_move : Node2D, location : Vector2i) :
+func move_block(block_to_move : Node2D, location : Vector2i, tween :=  false) :
 	grid[block_to_move.location.x][block_to_move.location.y] = null
+	var previous_position = block_to_move.location
 	block_to_move.location = location
 	if grid[block_to_move.location.x][block_to_move.location.y] != null :
 		printerr("trying to move block to a spot that is already full!!")
 	grid[block_to_move.location.x][block_to_move.location.y] = block_to_move
-	block_to_move.position = location_to_position(block_to_move.location)
+	if tween :
+		var movement_tween := create_tween()
+		movement_tween.tween_property(block_to_move, "position", Vector2(location_to_position(block_to_move.location)), 0.3)
+	else :
+		block_to_move.position = location_to_position(block_to_move.location)
 
 func is_valid_move(location) -> bool :
 	if location.x >= board_width or location.x < 0 or location.y >= board_height or location.y < 0: 
