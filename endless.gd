@@ -11,6 +11,7 @@ var grid : Array
 var seed_block : Node2D
 var stem_block : Node2D
 var rotation_state := 0
+var fast_dropping := false
 
 var gravity_timer : Timer
 @export var gravity_time := 1.0
@@ -61,18 +62,38 @@ func _input(event: InputEvent) -> void:
 		var new_seed_location = seed_block.location + Vector2i(-1, 0)
 		var new_stem_location = stem_block.location + Vector2i(-1, 0)
 		if is_valid_move(new_seed_location) and is_valid_move(new_stem_location) :
-			move_block(seed_block, new_seed_location)
-			move_block(stem_block, new_stem_location)
+			if rotation_state != 3 :
+				move_block(seed_block, new_seed_location)
+				move_block(stem_block, new_stem_location)
+			else :
+				move_block(stem_block, new_stem_location)
+				move_block(seed_block, new_seed_location)
 	elif event.is_action_pressed("ui_right") :
 		var new_seed_location = seed_block.location + Vector2i(1, 0)
 		var new_stem_location = stem_block.location + Vector2i(1, 0)
 		if is_valid_move(new_seed_location) and is_valid_move(new_stem_location) :
-			move_block(seed_block, new_seed_location)
-			move_block(stem_block, new_stem_location)
+			if rotation_state != 1 :
+				move_block(seed_block, new_seed_location)
+				move_block(stem_block, new_stem_location)
+			else :
+				move_block(stem_block, new_stem_location)
+				move_block(seed_block, new_seed_location)
 	elif event.is_action_pressed("ui_accept") :
 		rotate_falling_blocks(false)
 	elif event.is_action_pressed("ui_cancel") :
 		rotate_falling_blocks(true)
+	elif event.is_action_pressed("ui_down") :
+		_on_gravity_timer_timeout()
+		gravity_timer.wait_time = 0.1
+		gravity_timer.start()
+		fast_dropping = true
+		
+
+func _process(delta: float) -> void:
+	if !Input.is_action_pressed("ui_down") and fast_dropping :
+		fast_dropping = false
+		gravity_timer.wait_time = gravity_time
+		gravity_timer.start()
 
 func rotate_falling_blocks(clockwise := true) :
 	var desired_rotation_state : int
@@ -105,29 +126,35 @@ func _on_gravity_timer_timeout() :
 		var new_seed_location = seed_block.location + Vector2i(0, 1)
 		var new_stem_location = stem_block.location + Vector2i(0, 1)
 		if is_valid_move(new_seed_location) and is_valid_move(new_stem_location) :
-			move_block(seed_block, new_seed_location)
-			move_block(stem_block, new_stem_location)
+			if rotation_state != 2 :
+				move_block(seed_block, new_seed_location)
+				move_block(stem_block, new_stem_location)
+			else :
+				move_block(stem_block, new_stem_location)
+				move_block(seed_block, new_seed_location)
 		else :
 			place_piece()
 		
 	gravity_timer.start()
 
 func place_piece() :
-	var dropping_seed_block = seed_block
-	var dropping_stem_block = stem_block
+	#var dropping_seed_block = seed_block
+	#var dropping_stem_block = stem_block
 	seed_block = null
 	stem_block = null
 	
-	var test_location : Vector2i
-	test_location = dropping_seed_block.location + Vector2i(0, 1)
-	while is_valid_move(test_location) :
-		move_block(dropping_seed_block, test_location)
-		test_location += Vector2i(0, 1)
+	drop_blocks()
 	
-	test_location = dropping_stem_block.location + Vector2i(0, 1)
-	while is_valid_move(test_location) :
-		move_block(dropping_stem_block, test_location)
-		test_location += Vector2i(0, 1)
+	#var test_location : Vector2i
+	#test_location = dropping_seed_block.location + Vector2i(0, 1)
+	#while is_valid_move(test_location) :
+		#move_block(dropping_seed_block, test_location)
+		#test_location += Vector2i(0, 1)
+	#
+	#test_location = dropping_stem_block.location + Vector2i(0, 1)
+	#while is_valid_move(test_location) :
+		#move_block(dropping_stem_block, test_location)
+		#test_location += Vector2i(0, 1)
 	
 	spawn_blocks()
 	pass #turn falling pieces into real pieces, check for chain
@@ -139,7 +166,15 @@ func _on_drop_timer_timeout() :
 	pass
 
 func drop_blocks() :
-	pass #drops all the blocks in the grid
+	for row in board_height :
+		for column in range(board_width - 1, -1, -1) :
+			var dropping_block = grid[column][row]
+			if dropping_block != null :
+				var test_location : Vector2i
+				test_location = dropping_block.location + Vector2i(0, 1)
+				while is_valid_move(test_location) :
+					move_block(dropping_block, test_location)
+					test_location += Vector2i(0, 1)
 
 #return true if the chain is continuing
 func check_for_chain() -> bool :
