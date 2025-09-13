@@ -179,6 +179,59 @@ func drop_blocks() :
 
 #return true if the chain is continuing
 func check_for_chain() -> bool :
+	#check for clearing
+	for row in range(board_height - 1, -1, -1) :
+		for column in board_width :
+			var test_block = grid[column][row]
+			if test_block != null :
+				var blocks_to_check := [test_block]
+				var color_num = test_block.color_num
+				for check_block in blocks_to_check :
+					
+					#horizontal check :
+					var test_location = test_block.location + Vector2i(1, 0)
+					var horizontal_blocks := [check_block]
+					while true :
+						if test_location.x >= board_width :
+							break
+						if grid[test_location.x][test_location.y] == null :
+							break
+						if grid[test_location.x][test_location.y].color_num != color_num :
+							break
+						horizontal_blocks.append(grid[test_location.x][test_location.y])
+						print("found something horizontally!")
+						test_location += Vector2i(1, 0)
+						
+					if horizontal_blocks.size() >= 3 :
+						for horizontal_block in horizontal_blocks :
+							if not horizontal_block in blocks_to_check :
+								blocks_to_check.append(horizontal_block)
+					
+					#vertical check :
+					test_location = test_block.location + Vector2i(0, -1)
+					var vertical_blocks := [check_block]
+					while true :
+						if test_location.y < 0 :
+							break
+						if grid[test_location.x][test_location.y] == null :
+							break
+						if grid[test_location.x][test_location.y].color_num != color_num :
+							break
+						vertical_blocks.append(grid[test_location.x][test_location.y])
+						print("found something vertical!")
+						test_location += Vector2i(0, -1)
+					print("found")
+					if vertical_blocks.size() >= 3 :
+						for vertical_block in vertical_blocks :
+							if not vertical_block in blocks_to_check :
+								blocks_to_check.append(vertical_block)
+				
+				if blocks_to_check.size() > 1 :
+					for popping_block in blocks_to_check :
+						popping_block.queue_free()
+						grid[popping_block.location.x][popping_block.location.y] = null
+			
+	
 	#check for merging
 	for row in range(board_height - 1, -1, -1) :
 		for column in board_width :
@@ -229,62 +282,7 @@ func check_for_chain() -> bool :
 						grid[column][row - 1].queue_free()
 						grid[column][row - 1] = null
 						test_block.change_color(combination_color)
-					
-	for row in range(board_height - 1, -1, -1) :
-		for column in board_width :
-			var test_block = grid[column][row]
-			if test_block != null :
-				var blocks_to_check := [test_block]
-				var color_num = test_block.color_num
-				for check_block in blocks_to_check :
-					
-					#horizontal check :
-					var test_location = test_block.location + Vector2i(1, 0)
-					var horizontal_blocks := [check_block]
-					while true :
-						if test_location.x >= board_width :
-							break
-						if grid[test_location.x][test_location.y] == null :
-							break
-						if grid[test_location.x][test_location.y].color_num != color_num :
-							break
-						horizontal_blocks.append(grid[test_location.x][test_location.y])
-						print("found something horizontally!")
-						test_location += Vector2i(1, 0)
-						
-					if horizontal_blocks.size() >= 3 :
-						for horizontal_block in horizontal_blocks :
-							if not horizontal_block in blocks_to_check :
-								blocks_to_check.append(horizontal_block)
-					
-					#vertical check :
-					test_location = test_block.location + Vector2i(0, -1)
-					var vertical_blocks := [check_block]
-					while true :
-						if test_location.y < 0 :
-							break
-						if grid[test_location.x][test_location.y] == null :
-							break
-						if grid[test_location.x][test_location.y].color_num != color_num :
-							break
-						vertical_blocks.append(grid[test_location.x][test_location.y])
-						print("found something vertical!")
-						test_location += Vector2i(0, -1)
-					print("found")
-					if vertical_blocks.size() >= 3 :
-						for vertical_block in vertical_blocks :
-							if not vertical_block in blocks_to_check :
-								blocks_to_check.append(vertical_block)
-				
-				if blocks_to_check.size() > 1 :
-					for popping_block in blocks_to_check :
-						popping_block.queue_free()
-						grid[popping_block.location.x][popping_block.location.y]
-			
-			
-			
-			
-			
+	
 	return false
 
 func spawn_blocks() -> void :
