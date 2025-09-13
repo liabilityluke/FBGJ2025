@@ -1,7 +1,7 @@
 extends Node2D
 
 @export var board_width := 6
-@export var board_height := 11
+@export var board_height := 10
 var cell_size := 64
 var board_start_position := Vector2i(0, 0)
 @export var spawn_location := Vector2i(2, 1)
@@ -144,7 +144,8 @@ func place_piece() :
 	stem_block = null
 	
 	drop_blocks()
-	
+	check_for_chain()
+	drop_blocks()
 	#var test_location : Vector2i
 	#test_location = dropping_seed_block.location + Vector2i(0, 1)
 	#while is_valid_move(test_location) :
@@ -166,8 +167,8 @@ func _on_drop_timer_timeout() :
 	pass
 
 func drop_blocks() :
-	for row in board_height :
-		for column in range(board_width - 1, -1, -1) :
+	for row in range(board_height - 1, -1, -1) :
+		for column in board_width :
 			var dropping_block = grid[column][row]
 			if dropping_block != null :
 				var test_location : Vector2i
@@ -178,6 +179,112 @@ func drop_blocks() :
 
 #return true if the chain is continuing
 func check_for_chain() -> bool :
+	#check for merging
+	for row in range(board_height - 1, -1, -1) :
+		for column in board_width :
+			var test_block = grid[column][row]
+			if row != 0 :
+				if test_block != null and grid[column][row - 1] != null :
+					var combining_color_num = grid[column][row - 1].color_num
+					var test_color_num = test_block.color_num
+					var combination_color := -1
+					
+					match test_color_num :
+						0 : #red
+							match combining_color_num :
+								1 :
+									combination_color = 5
+								2 :
+									combination_color = 4
+								3 :
+									combination_color = 6
+						1 :  #green
+							match combining_color_num :
+								0 :
+									combination_color = 5
+								2 :
+									combination_color = 3
+								4 :
+									combination_color = 6
+						2 : #blue
+							match combining_color_num :
+								0 :
+									combination_color = 4
+								1 :
+									combination_color = 3
+								5 :
+									combination_color = 6
+						3 : #cyan
+							if combining_color_num == 0 :
+								combination_color = 6
+						4 : #magenta
+							if combining_color_num == 1 :
+								combination_color = 6
+						5 : #yellow
+							if combining_color_num == 2 :
+								combination_color = 6
+					
+					#might have 0 null confusion if i misunderstand how this works
+					if combination_color != -1 :
+						grid[column][row - 1].queue_free()
+						grid[column][row - 1] = null
+						test_block.change_color(combination_color)
+					
+	for row in range(board_height - 1, -1, -1) :
+		for column in board_width :
+			var test_block = grid[column][row]
+			if test_block != null :
+				var blocks_to_check := [test_block]
+				var color_num = test_block.color_num
+				for check_block in blocks_to_check :
+					
+					#horizontal check :
+					var test_location = test_block.location + Vector2i(1, 0)
+					var horizontal_blocks := [check_block]
+					while true :
+						if test_location.x >= board_width :
+							break
+						if grid[test_location.x][test_location.y] == null :
+							break
+						if grid[test_location.x][test_location.y].color_num != color_num :
+							break
+						horizontal_blocks.append(grid[test_location.x][test_location.y])
+						print("found something horizontally!")
+						test_location += Vector2i(1, 0)
+						
+					if horizontal_blocks.size() >= 3 :
+						for horizontal_block in horizontal_blocks :
+							if not horizontal_block in blocks_to_check :
+								blocks_to_check.append(horizontal_block)
+					
+					#vertical check :
+					test_location = test_block.location + Vector2i(0, -1)
+					var vertical_blocks := [check_block]
+					while true :
+						if test_location.y < 0 :
+							break
+						if grid[test_location.x][test_location.y] == null :
+							break
+						if grid[test_location.x][test_location.y].color_num != color_num :
+							break
+						vertical_blocks.append(grid[test_location.x][test_location.y])
+						print("found something vertical!")
+						test_location += Vector2i(0, -1)
+					print("found")
+					if vertical_blocks.size() >= 3 :
+						for vertical_block in vertical_blocks :
+							if not vertical_block in blocks_to_check :
+								blocks_to_check.append(vertical_block)
+				
+				if blocks_to_check.size() > 1 :
+					for popping_block in blocks_to_check :
+						popping_block.queue_free()
+						grid[popping_block.location.x][popping_block.location.y]
+			
+			
+			
+			
+			
 	return false
 
 func spawn_blocks() -> void :
