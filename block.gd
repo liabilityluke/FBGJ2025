@@ -19,7 +19,6 @@ func _ready() :
 	pass
 
 func change_color(_color_num) :
-	print(_color_num)
 	color_num = _color_num
 	match color_num :
 		0 : 

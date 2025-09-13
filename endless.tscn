@@ -4,6 +4,7 @@
 
 [node name="Board" type="Node2D"]
 script = ExtResource("1_mjc6l")
+primary_chance = 1.0
 
 [node name="ColorRect" type="ColorRect" parent="."]
 visible = false

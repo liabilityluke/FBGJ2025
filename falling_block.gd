@@ -17,7 +17,6 @@ var color_num := 0
 var location := Vector2i(0, 0)
 
 func _ready() :
-	print(COLOR_NUM.MAGENTA)
 	change_color(COLOR_NUM.MAGENTA)
 
 func change_color(_color_num) :
