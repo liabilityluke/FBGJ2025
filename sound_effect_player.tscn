@@ -1,0 +1,8 @@
+[gd_scene load_steps=2 format=3 uid="uid://bl4c6kum47nvj"]
+
+[ext_resource type="Script" uid="uid://bcjy70siibfwe" path="res://sound_effect_player.gd" id="1_dy2jx"]
+
+[node name="SoundEffectPlayer" type="AudioStreamPlayer"]
+script = ExtResource("1_dy2jx")
+
+[connection signal="finished" from="." to="." method="_on_finished"]

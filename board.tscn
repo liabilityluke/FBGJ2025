@@ -1,0 +1,37 @@
+[gd_scene load_steps=8 format=3 uid="uid://dq6y6dq8mwh10"]
+
+[ext_resource type="Script" uid="uid://dxaxjhc4nxrt3" path="res://board.gd" id="1_p0ybc"]
+
+[sub_resource type="QuadMesh" id="QuadMesh_p0ybc"]
+size = Vector2(392, 648)
+
+[sub_resource type="Gradient" id="Gradient_psm7c"]
+offsets = PackedFloat32Array(1)
+colors = PackedColorArray(1, 1, 1, 1)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_8l818"]
+gradient = SubResource("Gradient_psm7c")
+
+[sub_resource type="QuadMesh" id="QuadMesh_jqgjh"]
+size = Vector2(384, 640)
+
+[sub_resource type="Gradient" id="Gradient_vf5bc"]
+offsets = PackedFloat32Array(1)
+colors = PackedColorArray(0, 0, 0, 1)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_mgc1s"]
+gradient = SubResource("Gradient_vf5bc")
+
+[node name="Board" type="Node2D"]
+script = ExtResource("1_p0ybc")
+primary_chance = 1.0
+
+[node name="Border" type="MeshInstance2D" parent="."]
+position = Vector2(192, 320)
+mesh = SubResource("QuadMesh_p0ybc")
+texture = SubResource("GradientTexture1D_8l818")
+
+[node name="Board" type="MeshInstance2D" parent="."]
+position = Vector2(192, 320)
+mesh = SubResource("QuadMesh_jqgjh")
+texture = SubResource("GradientTexture1D_mgc1s")

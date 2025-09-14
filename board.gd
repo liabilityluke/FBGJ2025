@@ -14,7 +14,7 @@ var rotation_state := 0
 var fast_dropping := false
 
 var gravity_timer : Timer
-@export var gravity_time := 1.0
+@export var gravity_time := 0.5
 
 var chain_timer : Timer
 @export var chain_time := 0.5
@@ -142,7 +142,10 @@ func place_piece() :
 	#var dropping_stem_block = stem_block
 	seed_block = null
 	stem_block = null
-	
+	var sfx = preload("res://sound_effect_player.tscn").instantiate()
+	add_child(sfx)
+	sfx.stream = preload("res://assets/land.wav")
+	sfx.play()
 	on_chain_timer_timeout()
 	#drop_blocks()
 	#check_for_chain()
@@ -184,7 +187,7 @@ func drop_blocks() :
 
 #return true if the chain is continuing
 func check_for_chain() -> bool :
-	print("---")
+	
 	var chain_detected := false
 	#check for clearing
 	var popping_blocks = []
@@ -217,10 +220,16 @@ func check_for_chain() -> bool :
 		for popping_block in popping_blocks :
 			popping_block.queue_free()
 			grid[popping_block.location.x][popping_block.location.y] = null
+		var sfx = preload("res://sound_effect_player.tscn").instantiate()
+		add_child(sfx)
+		sfx.stream = preload("res://assets/clear_red.wav")
+		sfx.play()
+			
 		chain_detected = true
 			
 	
 	#check for merging
+	var merging := false
 	for row in range(board_height - 1, -1, -1) :
 		for column in board_width :
 			var test_block = grid[column][row]
@@ -267,11 +276,16 @@ func check_for_chain() -> bool :
 					
 					#might have 0 null confusion if i misunderstand how this works
 					if combination_color != -1 :
+						merging = true
 						grid[column][row - 1].queue_free()
 						grid[column][row - 1] = null
 						test_block.change_color(combination_color, true)
 						chain_detected = true
-	
+	if merging :
+		var sfx = preload("res://sound_effect_player.tscn").instantiate()
+		add_child(sfx)
+		sfx.stream = preload("res://assets/fuse.wav")
+		sfx.play()
 	return chain_detected
 
 func spawn_blocks() -> void :
@@ -292,7 +306,7 @@ func spawn_blocks() -> void :
 
 func move_block(block_to_move : Node2D, location : Vector2i, tween :=  false) :
 	grid[block_to_move.location.x][block_to_move.location.y] = null
-	var previous_position = block_to_move.location
+	#var previous_position = block_to_move.location
 	block_to_move.location = location
 	if grid[block_to_move.location.x][block_to_move.location.y] != null :
 		printerr("trying to move block to a spot that is already full!!")
