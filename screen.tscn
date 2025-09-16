@@ -1,0 +1,18 @@
+[gd_scene load_steps=3 format=3 uid="uid://b0an7k5opwfit"]
+
+[ext_resource type="PackedScene" uid="uid://dq6y6dq8mwh10" path="res://board.tscn" id="1_vouji"]
+[ext_resource type="Script" uid="uid://cmdsbfu06au43" path="res://objectives.gd" id="2_7cosj"]
+
+[node name="Node2D" type="Node2D"]
+
+[node name="Board" parent="." instance=ExtResource("1_vouji")]
+position = Vector2(406, 7)
+
+[node name="Objectives" type="RichTextLabel" parent="."]
+offset_left = 108.0
+offset_top = 76.0
+offset_right = 366.0
+offset_bottom = 358.0
+script = ExtResource("2_7cosj")
+
+[connection signal="chain_finished" from="Board" to="Objectives" method="_on_board_chain_finished"]

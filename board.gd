@@ -37,6 +37,25 @@ var wallkick_counter := 0
 
 @export var chain_multiplier : Array[float] = [1.0]
 
+var chain_results := {
+		"points" : 0,
+		"blocks_merged" : 0,
+		"chain_length" : 0,
+		"total_popped" : 0,
+		"primary_popped" : 0,
+		"secondary_popped" : 0,
+		"red popped" : 0,
+		"blue popped" : 0,
+		"green popped" : 0,
+		"cyan popped" : 0,
+		"magenta popped" : 0,
+		"yellow popped" : 0,
+		"white popped" : 0
+	}
+
+signal chain_finished(chain_results)
+
+
 func _ready() -> void:
 	#form the grid
 	for i in board_width :
@@ -187,10 +206,27 @@ func on_chain_timer_timeout() :
 
 func _on_drop_timer_timeout() :
 	chain_num += 1
+	chain_results["chain_length"] = chain_num
 	if check_for_chain() :
 		chain_timer.start()
 	else :
 		chain_num = 0
+		chain_finished.emit(chain_results)
+		chain_results = {
+			"points" : 0,
+			"blocks_merged" : 0,
+			"chain_length" : 0,
+			"total_popped" : 0,
+			"primary_popped" : 0,
+			"secondary_popped" : 0,
+			"red_popped" : 0,
+			"blue_popped" : 0,
+			"green_popped" : 0,
+			"cyan_popped" : 0,
+			"magenta_popped" : 0,
+			"yellow_popped" : 0,
+			"white_popped" : 0
+		}
 		spawn_blocks()
 
 func drop_blocks() :
@@ -237,8 +273,34 @@ func check_for_chain() -> bool :
 				
 	if popping_blocks.size() > 1 :
 		score += 100 * chain_multiplier[min(chain_num - 1, chain_multiplier.size() - 1)] * popping_blocks.size()
+		chain_results["points"] += 100 * chain_multiplier[min(chain_num - 1, chain_multiplier.size() - 1)] * popping_blocks.size()
 		score_updated.emit(score)
+		
 		for popping_block in popping_blocks :
+			
+			chain_results["total_popped"] += 1
+			match popping_block.color_num :
+				0 :
+					chain_results["primary_popped"] += 1
+					chain_results["red_popped"] += 1
+				1 :
+					chain_results["primary_popped"] += 1
+					chain_results["green_popped"] += 1
+				2 :
+					chain_results["primary_popped"] += 1
+					chain_results["blue_popped"] += 1
+				3 :
+					chain_results["secondary_popped"] += 1
+					chain_results["cyan_popped"] += 1
+				4 :
+					chain_results["secondary_popped"] += 1
+					chain_results["magenta_popped"] += 1
+				5 :
+					chain_results["secondary_popped"] += 1
+					chain_results["yellow_popped"] += 1
+				6 :
+					chain_results["white_popped"] += 1
+			
 			popping_block.queue_free()
 			grid[popping_block.location.x][popping_block.location.y] = null
 		var sfx = preload("res://sound_effect_player.tscn").instantiate()
@@ -298,7 +360,8 @@ func check_for_chain() -> bool :
 					#might have 0 null confusion if i misunderstand how this works
 					if combination_color != -1 :
 						score += 50 * chain_multiplier[min(chain_num - 1, chain_multiplier.size() - 1)]
-						#score += 50 * int(pow(chain_num, 1.5))
+						chain_results["points"] += 50 * chain_multiplier[min(chain_num - 1, chain_multiplier.size() - 1)]
+						chain_results["blocks_merged"] += 1
 						
 						merging = true
 						grid[column][row - 1].queue_free()
