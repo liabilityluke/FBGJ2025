@@ -33,6 +33,10 @@ var chain_num := 0
 var score := 0
 signal score_updated(score)
 
+var wallkick_counter := 0
+
+@export var chain_multiplier : Array[float] = [1.0]
+
 func _ready() -> void:
 	#form the grid
 	for i in board_width :
@@ -121,6 +125,15 @@ func rotate_falling_blocks(clockwise := true) :
 	if is_valid_move(seed_block.location + stem_vector) :
 		rotation_state = desired_rotation_state
 		move_block(stem_block, seed_block.location + stem_vector)
+	elif is_valid_move(seed_block.location - stem_vector) :
+		rotation_state = desired_rotation_state
+		move_block(seed_block, seed_block.location - stem_vector)
+		move_block(stem_block, seed_block.location + stem_vector)
+		if wallkick_counter >= 3 :
+			place_piece()
+		if rotation_state == 2:
+			wallkick_counter += 1
+		
 
 func location_to_position(location: Vector2i) -> Vector2i:
 	return board_start_position + Vector2i((0.5+location.x)*cell_size, (0.5+location.y)*cell_size)
@@ -223,7 +236,7 @@ func check_for_chain() -> bool :
 					
 				
 	if popping_blocks.size() > 1 :
-		score += 100 * int(pow(chain_num, 1.5)) * popping_blocks.size()
+		score += 100 * chain_multiplier[min(chain_num - 1, chain_multiplier.size() - 1)] * popping_blocks.size()
 		score_updated.emit(score)
 		for popping_block in popping_blocks :
 			popping_block.queue_free()
@@ -284,7 +297,8 @@ func check_for_chain() -> bool :
 					
 					#might have 0 null confusion if i misunderstand how this works
 					if combination_color != -1 :
-						score += 50 * int(pow(chain_num, 1.5))
+						score += 50 * chain_multiplier[min(chain_num - 1, chain_multiplier.size() - 1)]
+						#score += 50 * int(pow(chain_num, 1.5))
 						
 						merging = true
 						grid[column][row - 1].queue_free()
@@ -301,6 +315,7 @@ func check_for_chain() -> bool :
 	return chain_detected
 
 func spawn_blocks() -> void :
+	wallkick_counter = 0
 	rotation_state = 0
 	
 	if is_valid_move(spawn_location) and is_valid_move(spawn_location + Vector2i(0, -1)) :
@@ -333,11 +348,10 @@ func is_valid_move(location) -> bool :
 	if location.x >= board_width or location.x < 0 or location.y >= board_height or location.y < 0: 
 		return false
 	return (grid[location.x][location.y] == null) or (grid[location.x][location.y] == seed_block) or (grid[location.x][location.y] == stem_block)
-	
+
 func generate_weighted_random_color(primary_weight := 0.75) :
 	pass
 	if randf() < primary_weight :
 		return randi_range(0, 2)
 	else :
 		return randi_range(3, 5)
-	
