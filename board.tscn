@@ -1,6 +1,7 @@
-[gd_scene load_steps=8 format=3 uid="uid://dq6y6dq8mwh10"]
+[gd_scene load_steps=9 format=3 uid="uid://dq6y6dq8mwh10"]
 
 [ext_resource type="Script" uid="uid://dxaxjhc4nxrt3" path="res://board.gd" id="1_p0ybc"]
+[ext_resource type="Script" uid="uid://bddoxfiyeg74q" path="res://rich_text_label.gd" id="2_psm7c"]
 
 [sub_resource type="QuadMesh" id="QuadMesh_p0ybc"]
 size = Vector2(392, 648)
@@ -35,3 +36,14 @@ texture = SubResource("GradientTexture1D_8l818")
 position = Vector2(192, 320)
 mesh = SubResource("QuadMesh_jqgjh")
 texture = SubResource("GradientTexture1D_mgc1s")
+
+[node name="RichTextLabel" type="RichTextLabel" parent="."]
+offset_left = 413.0
+offset_top = 29.0
+offset_right = 891.0
+offset_bottom = 237.0
+theme_override_font_sizes/normal_font_size = 50
+text = "0"
+script = ExtResource("2_psm7c")
+
+[connection signal="score_updated" from="." to="RichTextLabel" method="_on_board_score_updated"]

@@ -28,6 +28,11 @@ var block := preload("res://block.tscn")
 
 @export var primary_chance := 0.75
 
+var chain_num := 0
+
+var score := 0
+signal score_updated(score)
+
 func _ready() -> void:
 	#form the grid
 	for i in board_width :
@@ -116,7 +121,6 @@ func rotate_falling_blocks(clockwise := true) :
 	if is_valid_move(seed_block.location + stem_vector) :
 		rotation_state = desired_rotation_state
 		move_block(stem_block, seed_block.location + stem_vector)
-		
 
 func location_to_position(location: Vector2i) -> Vector2i:
 	return board_start_position + Vector2i((0.5+location.x)*cell_size, (0.5+location.y)*cell_size)
@@ -169,9 +173,11 @@ func on_chain_timer_timeout() :
 	drop_timer.start()
 
 func _on_drop_timer_timeout() :
+	chain_num += 1
 	if check_for_chain() :
 		chain_timer.start()
 	else :
+		chain_num = 0
 		spawn_blocks()
 
 func drop_blocks() :
@@ -217,6 +223,8 @@ func check_for_chain() -> bool :
 					
 				
 	if popping_blocks.size() > 1 :
+		score += 100 * int(pow(chain_num, 1.5)) * popping_blocks.size()
+		score_updated.emit(score)
 		for popping_block in popping_blocks :
 			popping_block.queue_free()
 			grid[popping_block.location.x][popping_block.location.y] = null
@@ -276,16 +284,20 @@ func check_for_chain() -> bool :
 					
 					#might have 0 null confusion if i misunderstand how this works
 					if combination_color != -1 :
+						score += 50 * int(pow(chain_num, 1.5))
+						
 						merging = true
 						grid[column][row - 1].queue_free()
 						grid[column][row - 1] = null
 						test_block.change_color(combination_color, true)
 						chain_detected = true
 	if merging :
+		score_updated.emit(score)
 		var sfx = preload("res://sound_effect_player.tscn").instantiate()
 		add_child(sfx)
 		sfx.stream = preload("res://assets/fuse.wav")
 		sfx.play()
+	
 	return chain_detected
 
 func spawn_blocks() -> void :
