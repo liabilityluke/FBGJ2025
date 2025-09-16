@@ -9,22 +9,6 @@ class Objective :
 	
 	var test_function : Callable
 	
-	var requirements := {
-		"points" : 0,
-		"blocks_merged" : 0,
-		"chain_length" : 0,
-		"total_popped" : 0,
-		"primary_popped" : 0,
-		"secondary_popped" : 0,
-		"red popped" : 0,
-		"blue popped" : 0,
-		"green popped" : 0,
-		"cyan popped" : 0,
-		"magenta popped" : 0,
-		"yellow popped" : 0,
-		"white popped" : 0
-	}
-	
 	func _init(time, text, test_function) :
 		self.time = time
 		self.text = text
@@ -37,9 +21,19 @@ class Objective :
 
 
 func _ready() -> void:
-	objective_array.append(Objective.new(45, "Clear at least three in a row!", func(test_function) : return test_function["total_popped"] >= 3))
+	objective_array.append(Objective.new(30, "Clear at least three in a row!", func(test_function) : return test_function["total_popped"] >= 3))
+	objective_array.append(Objective.new(45, "Make a 2 chain!", func(test_function) : return test_function["chain_length"] >= 2))
+	objective_array.append(Objective.new(30, "Clear at least 3 white blocks!", func(test_function) : return test_function["white_popped"] >= 3))
+	objective_array.append(Objective.new(30, "Clear at least 6 blocks in a chain!", func(test_function) : return test_function["total_popped"] >= 6))
+	objective_array.append(Objective.new(30, "Merge 2 blocks in a chain!", func(test_function) : return test_function["blocks_merged"] >= 2))
+	objective_array.append(Objective.new(60, "Make a 3 chain!", func(test_function) : return test_function["chain_length"] >= 3))
+	objective_array.append(Objective.new(45, "Merge twice and clear 4 blocks in a single chain!", func(test_function) : return (test_function["total_popped"] >= 4 and test_function["blocks_merged"] >= 2)))
+	
 	
 	text = objective_array[0].text 
+	
+	$ObjectiveTimer.start_timer(objective_array[0].time)
+	
 
 
 func _on_board_chain_finished(chain_results: Variant) -> void:
@@ -49,5 +43,6 @@ func _on_board_chain_finished(chain_results: Variant) -> void:
 			if objective_array.size() > 0 :
 				
 				text = objective_array[0].text
+				$ObjectiveTimer.start_timer(objective_array[0].time)
 			else :
 				text = "you win!!"

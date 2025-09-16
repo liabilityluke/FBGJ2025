@@ -117,7 +117,7 @@ func _input(event: InputEvent) -> void:
 			gravity_timer.start()
 			fast_dropping = true
 
-func _process(delta: float) -> void:
+func _process(_delta: float) -> void:
 	if !Input.is_action_pressed("ui_down") and fast_dropping :
 		fast_dropping = false
 		gravity_timer.wait_time = gravity_time
@@ -205,10 +205,10 @@ func on_chain_timer_timeout() :
 	drop_timer.start()
 
 func _on_drop_timer_timeout() :
-	chain_num += 1
-	chain_results["chain_length"] = chain_num
 	if check_for_chain() :
 		chain_timer.start()
+		chain_num += 1
+		chain_results["chain_length"] = chain_num
 	else :
 		chain_num = 0
 		chain_finished.emit(chain_results)
@@ -272,8 +272,9 @@ func check_for_chain() -> bool :
 					
 				
 	if popping_blocks.size() > 1 :
-		score += 100 * chain_multiplier[min(chain_num - 1, chain_multiplier.size() - 1)] * popping_blocks.size()
-		chain_results["points"] += 100 * chain_multiplier[min(chain_num - 1, chain_multiplier.size() - 1)] * popping_blocks.size()
+		score += 100 * chain_multiplier[min(chain_num, chain_multiplier.size() - 1)] * popping_blocks.size()
+		
+		chain_results["points"] += 100 * chain_multiplier[min(chain_num, chain_multiplier.size() - 1)] * popping_blocks.size()
 		score_updated.emit(score)
 		
 		for popping_block in popping_blocks :
@@ -359,8 +360,8 @@ func check_for_chain() -> bool :
 					
 					#might have 0 null confusion if i misunderstand how this works
 					if combination_color != -1 :
-						score += 50 * chain_multiplier[min(chain_num - 1, chain_multiplier.size() - 1)]
-						chain_results["points"] += 50 * chain_multiplier[min(chain_num - 1, chain_multiplier.size() - 1)]
+						score += 50 * chain_multiplier[min(chain_num, chain_multiplier.size() - 1)]
+						chain_results["points"] += 50 * chain_multiplier[min(chain_num, chain_multiplier.size() - 1)]
 						chain_results["blocks_merged"] += 1
 						
 						merging = true
@@ -418,3 +419,6 @@ func generate_weighted_random_color(primary_weight := 0.75) :
 		return randi_range(0, 2)
 	else :
 		return randi_range(3, 5)
+
+func start_lose_screen() -> void:
+	get_tree().paused = true
