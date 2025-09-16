@@ -85,9 +85,41 @@ func _ready() -> void:
 	drop_timer.one_shot = true
 	drop_timer.timeout.connect(_on_drop_timer_timeout)
 
-func _input(event: InputEvent) -> void:
+#func _input(event: InputEvent) -> void:
+	#if seed_block != null and stem_block != null :
+		#if event.is_action_pressed("ui_left") :
+			#var new_seed_location = seed_block.location + Vector2i(-1, 0)
+			#var new_stem_location = stem_block.location + Vector2i(-1, 0)
+			#if is_valid_move(new_seed_location) and is_valid_move(new_stem_location) :
+				#if rotation_state != 3 :
+					#move_block(seed_block, new_seed_location)
+					#move_block(stem_block, new_stem_location)
+				#else :
+					#move_block(stem_block, new_stem_location)
+					#move_block(seed_block, new_seed_location)
+		#elif event.is_action_pressed("ui_right") :
+			#var new_seed_location = seed_block.location + Vector2i(1, 0)
+			#var new_stem_location = stem_block.location + Vector2i(1, 0)
+			#if is_valid_move(new_seed_location) and is_valid_move(new_stem_location) :
+				#if rotation_state != 1 :
+					#move_block(seed_block, new_seed_location)
+					#move_block(stem_block, new_stem_location)
+				#else :
+					#move_block(stem_block, new_stem_location)
+					#move_block(seed_block, new_seed_location)
+		#elif event.is_action_pressed("ui_accept") :
+			#rotate_falling_blocks(false)
+		#elif event.is_action_pressed("ui_cancel") :
+			#rotate_falling_blocks(true)
+		#elif event.is_action_pressed("ui_down") :
+			#_on_gravity_timer_timeout()
+			#gravity_timer.wait_time = 0.1
+			#gravity_timer.start()
+			#fast_dropping = true
+
+func _process(_delta: float) -> void:
 	if seed_block != null and stem_block != null :
-		if event.is_action_pressed("ui_left") :
+		if Input.is_action_just_pressed("ui_left") :
 			var new_seed_location = seed_block.location + Vector2i(-1, 0)
 			var new_stem_location = stem_block.location + Vector2i(-1, 0)
 			if is_valid_move(new_seed_location) and is_valid_move(new_stem_location) :
@@ -97,7 +129,7 @@ func _input(event: InputEvent) -> void:
 				else :
 					move_block(stem_block, new_stem_location)
 					move_block(seed_block, new_seed_location)
-		elif event.is_action_pressed("ui_right") :
+		elif Input.is_action_just_pressed("ui_right") :
 			var new_seed_location = seed_block.location + Vector2i(1, 0)
 			var new_stem_location = stem_block.location + Vector2i(1, 0)
 			if is_valid_move(new_seed_location) and is_valid_move(new_stem_location) :
@@ -107,17 +139,17 @@ func _input(event: InputEvent) -> void:
 				else :
 					move_block(stem_block, new_stem_location)
 					move_block(seed_block, new_seed_location)
-		elif event.is_action_pressed("ui_accept") :
+		elif Input.is_action_just_pressed("ui_accept") :
 			rotate_falling_blocks(false)
-		elif event.is_action_pressed("ui_cancel") :
+		elif Input.is_action_just_pressed("ui_cancel") :
 			rotate_falling_blocks(true)
-		elif event.is_action_pressed("ui_down") :
+		elif Input.is_action_just_pressed("ui_down") :
 			_on_gravity_timer_timeout()
 			gravity_timer.wait_time = 0.1
 			gravity_timer.start()
 			fast_dropping = true
 
-func _process(_delta: float) -> void:
+
 	if !Input.is_action_pressed("ui_down") and fast_dropping :
 		fast_dropping = false
 		gravity_timer.wait_time = gravity_time

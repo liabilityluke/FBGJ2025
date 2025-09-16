@@ -27,11 +27,10 @@ func _ready() -> void:
 	objective_array.append(Objective.new(30, "Clear at least 6 blocks in a chain!", func(test_function) : return test_function["total_popped"] >= 6))
 	objective_array.append(Objective.new(30, "Merge 2 blocks in a chain!", func(test_function) : return test_function["blocks_merged"] >= 2))
 	objective_array.append(Objective.new(60, "Make a 3 chain!", func(test_function) : return test_function["chain_length"] >= 3))
-	objective_array.append(Objective.new(45, "Merge twice and clear 4 blocks in a single chain!", func(test_function) : return (test_function["total_popped"] >= 4 and test_function["blocks_merged"] >= 2)))
+	objective_array.append(Objective.new(70, "Merge twice and clear 4 blocks in a single chain!", func(test_function) : return (test_function["total_popped"] >= 4 and test_function["blocks_merged"] >= 2)))
 	
 	
-	text = objective_array[0].text 
-	
+	text = objective_array[0].text
 	$ObjectiveTimer.start_timer(objective_array[0].time)
 	
 
