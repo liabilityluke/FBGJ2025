@@ -1,34 +1,104 @@
-[gd_scene load_steps=4 format=3 uid="uid://b0an7k5opwfit"]
+[gd_scene load_steps=8 format=3 uid="uid://b0an7k5opwfit"]
 
 [ext_resource type="PackedScene" uid="uid://dq6y6dq8mwh10" path="res://board.tscn" id="1_vouji"]
 [ext_resource type="Script" uid="uid://cmdsbfu06au43" path="res://objectives.gd" id="2_7cosj"]
 [ext_resource type="Script" uid="uid://bypqnv2ko70ls" path="res://objective_timer.gd" id="3_61bok"]
 
+[sub_resource type="Gradient" id="Gradient_61bok"]
+colors = PackedColorArray(0.54, 0.27, 0.54, 1, 1, 0.5, 1, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_ym1bn"]
+gradient = SubResource("Gradient_61bok")
+
+[sub_resource type="Curve" id="Curve_htcr4"]
+_data = [Vector2(0, 0.552948), 0.0, 0.0, 0, 0]
+point_count = 1
+
+[sub_resource type="Curve" id="Curve_r5wmr"]
+_limits = [-1.0, 1.0, 0.0, 1.0]
+_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(1, 1), 0.0, 0.0, 0, 0]
+point_count = 2
+
 [node name="Node2D" type="Node2D"]
 
-[node name="Board" parent="." instance=ExtResource("1_vouji")]
-position = Vector2(406, 4)
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+layer = -1
 
-[node name="Objectives" type="RichTextLabel" parent="."]
-offset_left = 108.0
-offset_top = 76.0
-offset_right = 366.0
-offset_bottom = 358.0
+[node name="ColorRect2" type="ColorRect" parent="CanvasLayer"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 1)
+
+[node name="ShapeSpawner" type="CPUParticles2D" parent="CanvasLayer"]
+position = Vector2(585, -500)
+texture = SubResource("GradientTexture2D_ym1bn")
+lifetime = 20.0
+preprocess = 20.0
+emission_shape = 3
+emission_rect_extents = Vector2(500, 1)
+direction = Vector2(0, 1)
+spread = 3.0
+gravity = Vector2(0, 0)
+initial_velocity_min = 100.0
+initial_velocity_max = 100.0
+angular_velocity_min = -20.0
+angular_velocity_max = 20.0
+scale_amount_min = 5.0
+scale_amount_max = 10.0
+split_scale = true
+scale_curve_x = SubResource("Curve_htcr4")
+scale_curve_y = null
+hue_variation_max = 1.0
+hue_variation_curve = SubResource("Curve_r5wmr")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="CanvasLayer"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 0.5
+
+[node name="ObjectiveTimer" type="RichTextLabel" parent="CanvasLayer/HBoxContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+size_flags_stretch_ratio = 0.5
+theme_override_font_sizes/normal_font_size = 100
+text = "60"
+horizontal_alignment = 1
+vertical_alignment = 1
+script = ExtResource("3_61bok")
+
+[node name="ColorRect" type="ColorRect" parent="CanvasLayer/HBoxContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+color = Color(0.435294, 0.435294, 0.435294, 0.392157)
+
+[node name="Objectives" type="RichTextLabel" parent="CanvasLayer/HBoxContainer/VBoxContainer/ColorRect"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_vertical = 3
+theme_override_font_sizes/normal_font_size = 30
 text = "Testing Testing!!!!"
 script = ExtResource("2_7cosj")
 
-[node name="ObjectiveTimer" type="RichTextLabel" parent="Objectives"]
-layout_mode = 1
-anchors_preset = -1
-anchor_top = 0.648
-anchor_right = 0.657
-anchor_bottom = 0.792
-offset_left = 46.0
-offset_top = -6.73601
-offset_right = 88.494
-offset_bottom = 58.656
-text = "60"
-script = ExtResource("3_61bok")
+[node name="CenterContainer" type="CenterContainer" parent="CanvasLayer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
 
-[connection signal="chain_finished" from="Board" to="Objectives" method="_on_board_chain_finished"]
-[connection signal="timeout" from="Objectives/ObjectiveTimer" to="Board" method="start_lose_screen"]
+[node name="Board" parent="CanvasLayer/HBoxContainer/CenterContainer" instance=ExtResource("1_vouji")]
+position = Vector2(0, 4)
+
+[connection signal="timeout" from="CanvasLayer/HBoxContainer/VBoxContainer/ObjectiveTimer" to="CanvasLayer/HBoxContainer/CenterContainer/Board" method="start_lose_screen"]
+[connection signal="chain_finished" from="CanvasLayer/HBoxContainer/CenterContainer/Board" to="CanvasLayer/HBoxContainer/VBoxContainer/ColorRect/Objectives" method="_on_board_chain_finished"]

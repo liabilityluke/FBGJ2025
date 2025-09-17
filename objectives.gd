@@ -31,7 +31,7 @@ func _ready() -> void:
 	
 	
 	text = objective_array[0].text
-	$ObjectiveTimer.start_timer(objective_array[0].time)
+	$"../../ObjectiveTimer".start_timer(objective_array[0].time)
 	
 
 
@@ -42,6 +42,6 @@ func _on_board_chain_finished(chain_results: Variant) -> void:
 			if objective_array.size() > 0 :
 				
 				text = objective_array[0].text
-				$ObjectiveTimer.start_timer(objective_array[0].time)
+				$"../../ObjectiveTimer".start_timer(objective_array[0].time)
 			else :
 				text = "you win!!"

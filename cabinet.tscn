@@ -1,7 +1,23 @@
-[gd_scene load_steps=6 format=3 uid="uid://byy7lkdp7264m"]
+[gd_scene load_steps=10 format=3 uid="uid://byy7lkdp7264m"]
 
 [ext_resource type="PackedScene" uid="uid://dxrv0s0i2eppq" path="res://assets/cabinet/cabinet(1).glb" id="1_ei0b6"]
 [ext_resource type="PackedScene" uid="uid://b0an7k5opwfit" path="res://screen.tscn" id="2_nb64c"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_nb64c"]
+sky_top_color = Color(0, 0, 0, 1)
+sky_horizon_color = Color(0, 0, 0, 1)
+ground_bottom_color = Color(0, 0, 0, 1)
+ground_horizon_color = Color(0, 0, 0, 1)
+sun_angle_max = 0.0
+
+[sub_resource type="Sky" id="Sky_pkbbd"]
+sky_material = SubResource("ProceduralSkyMaterial_nb64c")
+
+[sub_resource type="Environment" id="Environment_igc2x"]
+background_mode = 2
+sky = SubResource("Sky_pkbbd")
+tonemap_mode = 2
+glow_enabled = true
 
 [sub_resource type="ViewportTexture" id="ViewportTexture_nb64c"]
 viewport_path = NodePath("SubViewport")
@@ -12,25 +28,39 @@ shading_mode = 0
 albedo_texture = SubResource("ViewportTexture_nb64c")
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_ei0b6"]
-size = Vector2(2, 1)
+size = Vector2(1.5, 1)
+orientation = 2
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_nb64c"]
+flip_faces = true
+size = Vector2(40, 20)
 orientation = 2
 
 [node name="Node3D" type="Node3D"]
 
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(-0.866023, -0.433016, 0.250001, 0.0139347, 0.478902, 0.877758, -0.499809, 0.763643, -0.408706, 0, 0, 0)
+shadow_enabled = true
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_igc2x")
+
 [node name="Camera3D" type="Camera3D" parent="."]
-transform = Transform3D(-1, 0, -8.74228e-08, -1.08041e-08, 0.992334, 0.123584, 8.67526e-08, 0.123584, -0.992334, 0, 3.41295, -2.44604)
+transform = Transform3D(-1, 0, -8.74228e-08, -1.08041e-08, 0.992334, 0.123584, 8.67526e-08, 0.123584, -0.992334, 0, 3.41295, -2.46189)
 
 [node name="cabinet(1)" parent="." instance=ExtResource("1_ei0b6")]
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="."]
-transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 0, 3.26702, -1.07697)
+transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, -0.0199797, 3.21335, -1.07697)
 material_override = SubResource("StandardMaterial3D_pkbbd")
 mesh = SubResource("PlaneMesh_ei0b6")
 
 [node name="SubViewport" type="SubViewport" parent="."]
-size = Vector2i(1152, 648)
+size = Vector2i(972, 648)
 
-[node name="Camera2D" type="Camera2D" parent="SubViewport"]
-anchor_mode = 0
+[node name="Node2D" parent="SubViewport" instance=ExtResource("2_nb64c")]
 
-[node name="Node2D" parent="SubViewport/Camera2D" instance=ExtResource("2_nb64c")]
+[node name="MeshInstance3D2" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 6.46042)
+visible = false
+mesh = SubResource("PlaneMesh_nb64c")
