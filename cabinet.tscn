@@ -1,7 +1,9 @@
-[gd_scene load_steps=10 format=3 uid="uid://byy7lkdp7264m"]
+[gd_scene load_steps=12 format=3 uid="uid://byy7lkdp7264m"]
 
 [ext_resource type="PackedScene" uid="uid://dxrv0s0i2eppq" path="res://assets/cabinet/cabinet(1).glb" id="1_ei0b6"]
+[ext_resource type="Script" uid="uid://cgcdyv7ysfnvw" path="res://cabinet.gd" id="1_igc2x"]
 [ext_resource type="PackedScene" uid="uid://b0an7k5opwfit" path="res://screen.tscn" id="2_nb64c"]
+[ext_resource type="Script" uid="uid://begr64r2o8nr8" path="res://sub_viewport.gd" id="3_ssam1"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_nb64c"]
 sky_top_color = Color(0, 0, 0, 1)
@@ -37,6 +39,8 @@ size = Vector2(40, 20)
 orientation = 2
 
 [node name="Node3D" type="Node3D"]
+process_mode = 3
+script = ExtResource("1_igc2x")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
 transform = Transform3D(-0.866023, -0.433016, 0.250001, 0.0139347, 0.478902, 0.877758, -0.499809, 0.763643, -0.408706, 0, 0, 0)
@@ -57,8 +61,10 @@ mesh = SubResource("PlaneMesh_ei0b6")
 
 [node name="SubViewport" type="SubViewport" parent="."]
 size = Vector2i(972, 648)
+script = ExtResource("3_ssam1")
 
 [node name="Node2D" parent="SubViewport" instance=ExtResource("2_nb64c")]
+process_mode = 1
 
 [node name="MeshInstance3D2" type="MeshInstance3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 6.46042)

@@ -1,8 +1,11 @@
 extends RichTextLabel
 
 var objective_array := [] 
+var objective_number : int
 
 @export var objective_timer : Node
+
+signal won
 
 class Objective :
 	var time := 30
@@ -31,6 +34,7 @@ func _ready() -> void:
 	objective_array.append(Objective.new(60, "Make a 3 chain!", func(test_function) : return test_function["chain_length"] >= 3))
 	objective_array.append(Objective.new(70, "Merge twice and clear 4 blocks in a single chain!", func(test_function) : return (test_function["total_popped"] >= 4 and test_function["blocks_merged"] >= 2)))
 	
+	objective_number = objective_array.size()
 	
 	text = objective_array[0].text
 	objective_timer.start_timer(objective_array[0].time)
@@ -46,4 +50,6 @@ func _on_board_chain_finished(chain_results: Variant) -> void:
 				text = objective_array[0].text
 				objective_timer.start_timer(objective_array[0].time)
 			else :
-				text = "you win!!"
+				text = ""
+				won.emit()
+				

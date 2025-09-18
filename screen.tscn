@@ -1,11 +1,16 @@
-[gd_scene load_steps=9 format=3 uid="uid://b0an7k5opwfit"]
+[gd_scene load_steps=14 format=3 uid="uid://b0an7k5opwfit"]
 
 [ext_resource type="PackedScene" uid="uid://dq6y6dq8mwh10" path="res://board.tscn" id="1_vouji"]
 [ext_resource type="Script" uid="uid://cmdsbfu06au43" path="res://objectives.gd" id="2_7cosj"]
 [ext_resource type="Script" uid="uid://bypqnv2ko70ls" path="res://objective_timer.gd" id="3_61bok"]
+[ext_resource type="Script" uid="uid://co7do2qm352ky" path="res://win_screen.gd" id="4_ym1bn"]
+[ext_resource type="Script" uid="uid://0hyn8cq1d6ej" path="res://lose_screen.tres.gd" id="5_htcr4"]
+
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_61bok"]
+blend_mode = 1
 
 [sub_resource type="Gradient" id="Gradient_61bok"]
-colors = PackedColorArray(0.54, 0.27, 0.54, 1, 1, 0.5, 1, 1)
+colors = PackedColorArray(0.1, 0.05, 0.1, 1, 0.5, 0.25, 0.5, 1)
 
 [sub_resource type="GradientTexture2D" id="GradientTexture2D_ym1bn"]
 gradient = SubResource("Gradient_61bok")
@@ -26,6 +31,30 @@ corner_radius_top_right = 20
 corner_radius_bottom_right = 20
 corner_radius_bottom_left = 20
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ym1bn"]
+bg_color = Color(0, 0, 0, 0.784314)
+corner_radius_top_left = 20
+corner_radius_top_right = 20
+corner_radius_bottom_right = 20
+corner_radius_bottom_left = 20
+expand_margin_left = 20.0
+expand_margin_top = 20.0
+expand_margin_right = 20.0
+expand_margin_bottom = 20.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_htcr4"]
+bg_color = Color(1, 1, 1, 1)
+border_width_left = 20
+border_width_top = 20
+border_width_right = 20
+border_width_bottom = 20
+border_color = Color(1, 1, 1, 1)
+border_blend = true
+corner_radius_top_left = 20
+corner_radius_top_right = 20
+corner_radius_bottom_right = 20
+corner_radius_bottom_left = 20
+
 [node name="Node2D" type="Node2D"]
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
@@ -40,7 +69,9 @@ grow_vertical = 2
 color = Color(0, 0, 0, 1)
 
 [node name="ShapeSpawner" type="CPUParticles2D" parent="CanvasLayer"]
+material = SubResource("CanvasItemMaterial_61bok")
 position = Vector2(585, -500)
+amount = 12
 texture = SubResource("GradientTexture2D_ym1bn")
 lifetime = 20.0
 preprocess = 20.0
@@ -90,17 +121,12 @@ size_flags_stretch_ratio = 0.5
 theme_override_constants/margin_left = 20
 theme_override_constants/margin_right = 20
 
-[node name="Panel" type="Panel" parent="CanvasLayer/HBoxContainer/VBoxContainer/MarginContainer"]
+[node name="Panel" type="PanelContainer" parent="CanvasLayer/HBoxContainer/VBoxContainer/MarginContainer"]
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_61bok")
 
 [node name="MarginContainer" type="MarginContainer" parent="CanvasLayer/HBoxContainer/VBoxContainer/MarginContainer/Panel"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
+layout_mode = 2
 theme_override_constants/margin_left = 10
 theme_override_constants/margin_top = 10
 theme_override_constants/margin_right = 10
@@ -125,5 +151,123 @@ size_flags_horizontal = 3
 [node name="Board" parent="CanvasLayer/HBoxContainer/CenterContainer" instance=ExtResource("1_vouji")]
 position = Vector2(0, 4)
 
-[connection signal="timeout" from="CanvasLayer/HBoxContainer/VBoxContainer/ObjectiveTimer" to="CanvasLayer/HBoxContainer/CenterContainer/Board" method="start_lose_screen"]
+[node name="WinScreen" type="MarginContainer" parent="CanvasLayer"]
+process_mode = 3
+visible = false
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 100
+theme_override_constants/margin_top = 100
+theme_override_constants/margin_right = 100
+theme_override_constants/margin_bottom = 100
+script = ExtResource("4_ym1bn")
+
+[node name="Panel" type="PanelContainer" parent="CanvasLayer/WinScreen"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_ym1bn")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/WinScreen/Panel"]
+layout_mode = 2
+
+[node name="Congrats" type="Label" parent="CanvasLayer/WinScreen/Panel/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 50
+text = "Congratulations!"
+horizontal_alignment = 1
+
+[node name="Score" type="Label" parent="CanvasLayer/WinScreen/Panel/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 50
+text = "100000 pts"
+horizontal_alignment = 1
+
+[node name="PlayTime" type="Label" parent="CanvasLayer/WinScreen/Panel/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 50
+text = "100s"
+horizontal_alignment = 1
+
+[node name="WinButton" type="Button" parent="CanvasLayer/WinScreen/Panel/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_colors/font_disabled_color = Color(0, 0, 0, 1)
+theme_override_colors/font_hover_pressed_color = Color(0, 0, 0, 1)
+theme_override_colors/font_hover_color = Color(0, 0, 0, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_colors/font_focus_color = Color(0, 0, 0, 1)
+theme_override_colors/font_pressed_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/font_size = 50
+theme_override_styles/normal = SubResource("StyleBoxFlat_htcr4")
+text = "Play Again?"
+
+[node name="LoseScreen" type="MarginContainer" parent="CanvasLayer"]
+process_mode = 3
+visible = false
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 100
+theme_override_constants/margin_top = 100
+theme_override_constants/margin_right = 100
+theme_override_constants/margin_bottom = 100
+script = ExtResource("5_htcr4")
+
+[node name="Panel" type="PanelContainer" parent="CanvasLayer/LoseScreen"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_ym1bn")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/LoseScreen/Panel"]
+layout_mode = 2
+
+[node name="Fail" type="Label" parent="CanvasLayer/LoseScreen/Panel/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 50
+text = "Failed..."
+horizontal_alignment = 1
+
+[node name="Score" type="Label" parent="CanvasLayer/LoseScreen/Panel/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 50
+text = "100000 pts"
+horizontal_alignment = 1
+
+[node name="PlayTime" type="Label" parent="CanvasLayer/LoseScreen/Panel/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 50
+text = "100s"
+horizontal_alignment = 1
+
+[node name="Objectives" type="Label" parent="CanvasLayer/LoseScreen/Panel/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 50
+text = "4/5 Objectives"
+horizontal_alignment = 1
+
+[node name="LoseButton" type="Button" parent="CanvasLayer/LoseScreen/Panel/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_colors/font_disabled_color = Color(0, 0, 0, 1)
+theme_override_colors/font_hover_pressed_color = Color(0, 0, 0, 1)
+theme_override_colors/font_hover_color = Color(0, 0, 0, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_colors/font_focus_color = Color(0, 0, 0, 1)
+theme_override_colors/font_pressed_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/font_size = 50
+theme_override_styles/normal = SubResource("StyleBoxFlat_htcr4")
+text = "Play Again?"
+
+[connection signal="timeout" from="CanvasLayer/HBoxContainer/VBoxContainer/ObjectiveTimer" to="CanvasLayer/HBoxContainer/CenterContainer/Board" method="lose"]
+[connection signal="won" from="CanvasLayer/HBoxContainer/VBoxContainer/MarginContainer/Panel/MarginContainer/Objectives" to="CanvasLayer/HBoxContainer/CenterContainer/Board" method="win"]
 [connection signal="chain_finished" from="CanvasLayer/HBoxContainer/CenterContainer/Board" to="CanvasLayer/HBoxContainer/VBoxContainer/MarginContainer/Panel/MarginContainer/Objectives" method="_on_board_chain_finished"]
+[connection signal="lost" from="CanvasLayer/HBoxContainer/CenterContainer/Board" to="CanvasLayer/LoseScreen" method="_on_board_lost"]
+[connection signal="won" from="CanvasLayer/HBoxContainer/CenterContainer/Board" to="CanvasLayer/WinScreen" method="_on_board_won"]
+[connection signal="pressed" from="CanvasLayer/WinScreen/Panel/VBoxContainer/WinButton" to="CanvasLayer/WinScreen" method="_on_win_button_pressed"]
+[connection signal="pressed" from="CanvasLayer/WinScreen/Panel/VBoxContainer/WinButton" to="CanvasLayer/WinScreen/Panel/VBoxContainer/WinButton" method="_on_pressed"]
+[connection signal="pressed" from="CanvasLayer/LoseScreen/Panel/VBoxContainer/LoseButton" to="CanvasLayer/LoseScreen" method="_on_lose_button_pressed"]
