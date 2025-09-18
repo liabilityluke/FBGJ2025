@@ -2,6 +2,8 @@ extends RichTextLabel
 
 var objective_array := [] 
 
+@export var objective_timer : Node
+
 class Objective :
 	var time := 30
 	
@@ -31,7 +33,7 @@ func _ready() -> void:
 	
 	
 	text = objective_array[0].text
-	$"../../ObjectiveTimer".start_timer(objective_array[0].time)
+	objective_timer.start_timer(objective_array[0].time)
 	
 
 
@@ -42,6 +44,6 @@ func _on_board_chain_finished(chain_results: Variant) -> void:
 			if objective_array.size() > 0 :
 				
 				text = objective_array[0].text
-				$"../../ObjectiveTimer".start_timer(objective_array[0].time)
+				objective_timer.start_timer(objective_array[0].time)
 			else :
 				text = "you win!!"

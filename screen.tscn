@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3 uid="uid://b0an7k5opwfit"]
+[gd_scene load_steps=9 format=3 uid="uid://b0an7k5opwfit"]
 
 [ext_resource type="PackedScene" uid="uid://dq6y6dq8mwh10" path="res://board.tscn" id="1_vouji"]
 [ext_resource type="Script" uid="uid://cmdsbfu06au43" path="res://objectives.gd" id="2_7cosj"]
@@ -18,6 +18,13 @@ point_count = 1
 _limits = [-1.0, 1.0, 0.0, 1.0]
 _data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(1, 1), 0.0, 0.0, 0, 0]
 point_count = 2
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_61bok"]
+bg_color = Color(0, 0, 0, 0.392157)
+corner_radius_top_left = 20
+corner_radius_top_right = 20
+corner_radius_bottom_right = 20
+corner_radius_bottom_left = 20
 
 [node name="Node2D" type="Node2D"]
 
@@ -69,29 +76,47 @@ size_flags_stretch_ratio = 0.5
 [node name="ObjectiveTimer" type="RichTextLabel" parent="CanvasLayer/HBoxContainer/VBoxContainer"]
 layout_mode = 2
 size_flags_vertical = 3
-size_flags_stretch_ratio = 0.5
+size_flags_stretch_ratio = 0.55
 theme_override_font_sizes/normal_font_size = 100
 text = "60"
 horizontal_alignment = 1
 vertical_alignment = 1
 script = ExtResource("3_61bok")
 
-[node name="ColorRect" type="ColorRect" parent="CanvasLayer/HBoxContainer/VBoxContainer"]
+[node name="MarginContainer" type="MarginContainer" parent="CanvasLayer/HBoxContainer/VBoxContainer"]
 layout_mode = 2
 size_flags_vertical = 3
-color = Color(0.435294, 0.435294, 0.435294, 0.392157)
+size_flags_stretch_ratio = 0.5
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_right = 20
 
-[node name="Objectives" type="RichTextLabel" parent="CanvasLayer/HBoxContainer/VBoxContainer/ColorRect"]
+[node name="Panel" type="Panel" parent="CanvasLayer/HBoxContainer/VBoxContainer/MarginContainer"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_61bok")
+
+[node name="MarginContainer" type="MarginContainer" parent="CanvasLayer/HBoxContainer/VBoxContainer/MarginContainer/Panel"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="Objectives" type="RichTextLabel" parent="CanvasLayer/HBoxContainer/VBoxContainer/MarginContainer/Panel/MarginContainer" node_paths=PackedStringArray("objective_timer")]
+layout_mode = 2
 size_flags_vertical = 3
 theme_override_font_sizes/normal_font_size = 30
 text = "Testing Testing!!!!"
 script = ExtResource("2_7cosj")
+objective_timer = NodePath("../../../../ObjectiveTimer")
+
+[node name="CenterContainer" type="CenterContainer" parent="CanvasLayer/HBoxContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
 
 [node name="CenterContainer" type="CenterContainer" parent="CanvasLayer/HBoxContainer"]
 layout_mode = 2
@@ -101,4 +126,4 @@ size_flags_horizontal = 3
 position = Vector2(0, 4)
 
 [connection signal="timeout" from="CanvasLayer/HBoxContainer/VBoxContainer/ObjectiveTimer" to="CanvasLayer/HBoxContainer/CenterContainer/Board" method="start_lose_screen"]
-[connection signal="chain_finished" from="CanvasLayer/HBoxContainer/CenterContainer/Board" to="CanvasLayer/HBoxContainer/VBoxContainer/ColorRect/Objectives" method="_on_board_chain_finished"]
+[connection signal="chain_finished" from="CanvasLayer/HBoxContainer/CenterContainer/Board" to="CanvasLayer/HBoxContainer/VBoxContainer/MarginContainer/Panel/MarginContainer/Objectives" method="_on_board_chain_finished"]
