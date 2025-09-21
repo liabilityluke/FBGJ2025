@@ -49,6 +49,7 @@ func _on_board_chain_finished(chain_results: Variant) -> void:
 				
 				text = objective_array[0].text
 				objective_timer.start_timer(objective_array[0].time)
+				$"../../../../MarginContainer2/ProgressBar".value = (float(objective_number) - float(objective_array.size())) / float(objective_number)
 			else :
 				text = ""
 				won.emit()

@@ -188,6 +188,7 @@ func place_piece() :
 	add_child(sfx)
 	sfx.stream = preload("res://assets/land.wav")
 	sfx.bus = "SFX"
+	sfx.volume_db = 5.0
 	sfx.play()
 	on_chain_timer_timeout()
 	#drop_blocks()
@@ -314,6 +315,7 @@ func check_for_chain() -> bool :
 		var sfx = preload("res://sound_effect_player.tscn").instantiate()
 		add_child(sfx)
 		sfx.stream = preload("res://assets/clear_red.wav")
+		sfx.volume_db = 5.0
 		sfx.bus = "SFX"
 		sfx.play()
 			

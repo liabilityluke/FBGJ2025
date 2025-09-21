@@ -19,6 +19,10 @@ config/icon="res://icon.svg"
 
 SoundEffectPlayer="*res://sound_effect_player.gd"
 
+[gui]
+
+theme/custom_font="uid://c56vehjld81d7"
+
 [input]
 
 ui_accept={
