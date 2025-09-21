@@ -1,9 +1,10 @@
-[gd_scene load_steps=12 format=3 uid="uid://byy7lkdp7264m"]
+[gd_scene load_steps=16 format=3 uid="uid://byy7lkdp7264m"]
 
 [ext_resource type="PackedScene" uid="uid://dxrv0s0i2eppq" path="res://assets/cabinet/cabinet(1).glb" id="1_ei0b6"]
 [ext_resource type="Script" uid="uid://cgcdyv7ysfnvw" path="res://cabinet.gd" id="1_igc2x"]
 [ext_resource type="PackedScene" uid="uid://b0an7k5opwfit" path="res://screen.tscn" id="2_nb64c"]
 [ext_resource type="Script" uid="uid://begr64r2o8nr8" path="res://sub_viewport.gd" id="3_ssam1"]
+[ext_resource type="Script" uid="uid://bet5bf6d8fs1q" path="res://music_player.gd" id="5_ssam1"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_nb64c"]
 sky_top_color = Color(0, 0, 0, 1)
@@ -22,7 +23,7 @@ tonemap_mode = 2
 glow_enabled = true
 
 [sub_resource type="ViewportTexture" id="ViewportTexture_nb64c"]
-viewport_path = NodePath("SubViewport")
+viewport_path = NodePath("cabinet/SubViewport")
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_pkbbd"]
 resource_local_to_scene = true
@@ -38,6 +39,81 @@ flip_faces = true
 size = Vector2(40, 20)
 orientation = 2
 
+[sub_resource type="Animation" id="Animation_igc2x"]
+resource_name = "start_up"
+length = 3.0
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Camera3D:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 3),
+"transitions": PackedFloat32Array(2, 1),
+"update": 0,
+"values": [Vector3(0, 3.413, -5), Vector3(0, 3.413, -2.022)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("cabinet:rotation")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 3),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector3(0, 1.74533, 0), Vector3(0, 0, 0)]
+}
+tracks/2/type = "method"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath(".")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(2.5),
+"transitions": PackedFloat32Array(1),
+"values": [{
+"args": [],
+"method": &"start_game"
+}]
+}
+
+[sub_resource type="Animation" id="Animation_ssam1"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Camera3D:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector3(0, 3.413, -2.022)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("cabinet:rotation")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector3(0, 0, 0)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_2v0wj"]
+_data = {
+&"RESET": SubResource("Animation_ssam1"),
+&"start_up": SubResource("Animation_igc2x")
+}
+
 [node name="Node3D" type="Node3D"]
 process_mode = 3
 script = ExtResource("1_igc2x")
@@ -52,21 +128,38 @@ environment = SubResource("Environment_igc2x")
 [node name="Camera3D" type="Camera3D" parent="."]
 transform = Transform3D(-1, 0, -8.74228e-08, -1.08041e-08, 0.992334, 0.123584, 8.67526e-08, 0.123584, -0.992334, 0, 3.413, -2.022)
 
-[node name="cabinet(1)" parent="." instance=ExtResource("1_ei0b6")]
+[node name="cabinet" parent="." instance=ExtResource("1_ei0b6")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="cabinet"]
 transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, -0.0199797, 3.21335, -1.07697)
 material_override = SubResource("StandardMaterial3D_pkbbd")
 mesh = SubResource("PlaneMesh_ei0b6")
+skeleton = NodePath("../..")
 
-[node name="SubViewport" type="SubViewport" parent="."]
+[node name="SubViewport" type="SubViewport" parent="cabinet"]
 size = Vector2i(972, 648)
 script = ExtResource("3_ssam1")
 
-[node name="Node2D" parent="SubViewport" instance=ExtResource("2_nb64c")]
+[node name="Node2D" parent="cabinet/SubViewport" instance=ExtResource("2_nb64c")]
 process_mode = 1
 
 [node name="MeshInstance3D2" type="MeshInstance3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 6.46042)
 visible = false
 mesh = SubResource("PlaneMesh_nb64c")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+&"": SubResource("AnimationLibrary_2v0wj")
+}
+autoplay = "start_up"
+
+[node name="MusicPlayer" type="AudioStreamPlayer" parent="."]
+bus = &"Music"
+script = ExtResource("5_ssam1")
+
+[connection signal="lost" from="cabinet/SubViewport/Node2D/CanvasLayer/HBoxContainer/CenterContainer/Board" to="MusicPlayer" method="start_results"]
+[connection signal="won" from="cabinet/SubViewport/Node2D/CanvasLayer/HBoxContainer/CenterContainer/Board" to="MusicPlayer" method="start_results"]
+
+[editable path="cabinet/SubViewport/Node2D"]

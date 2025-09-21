@@ -187,6 +187,7 @@ func place_piece() :
 	var sfx = preload("res://sound_effect_player.tscn").instantiate()
 	add_child(sfx)
 	sfx.stream = preload("res://assets/land.wav")
+	sfx.bus = "SFX"
 	sfx.play()
 	on_chain_timer_timeout()
 	#drop_blocks()
@@ -313,6 +314,7 @@ func check_for_chain() -> bool :
 		var sfx = preload("res://sound_effect_player.tscn").instantiate()
 		add_child(sfx)
 		sfx.stream = preload("res://assets/clear_red.wav")
+		sfx.bus = "SFX"
 		sfx.play()
 			
 		chain_detected = true
@@ -380,6 +382,7 @@ func check_for_chain() -> bool :
 		var sfx = preload("res://sound_effect_player.tscn").instantiate()
 		add_child(sfx)
 		sfx.stream = preload("res://assets/fuse.wav")
+		sfx.bus = "SFX"
 		sfx.play()
 	
 	return chain_detected
