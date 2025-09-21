@@ -159,6 +159,10 @@ autoplay = "start_up"
 bus = &"Music"
 script = ExtResource("5_ssam1")
 
+[node name="OmniLight3D" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.75507, -4.54398)
+light_energy = 2.0
+
 [connection signal="lost" from="cabinet/SubViewport/Node2D/CanvasLayer/HBoxContainer/CenterContainer/Board" to="MusicPlayer" method="start_results"]
 [connection signal="won" from="cabinet/SubViewport/Node2D/CanvasLayer/HBoxContainer/CenterContainer/Board" to="MusicPlayer" method="start_results"]
 
